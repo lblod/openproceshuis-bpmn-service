@@ -49,7 +49,9 @@ app.post("/", async (req, res) => {
   const fileUriResult = await query(fileUriQuery);
   const fileUriBindings = fileUriResult.results.bindings;
   if (fileUriBindings.length === 0) {
-    return res.status(404).send("Not Found");
+    return res
+      .status(404)
+      .send("The file with the given file ID could not be found.");
   }
   const virtualFileUri = fileUriBindings[0].virtualFileUri.value;
   const physicalFileUri = fileUriBindings[0].physicalFileUri.value;

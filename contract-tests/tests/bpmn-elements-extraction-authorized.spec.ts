@@ -18,4 +18,15 @@ describe("bpmn elements extraction - authorized", () => {
     expect(status).toBe(400);
     expect(body).toBe("The request should contain a file ID as parameter.");
   });
+
+  test("invalid file id", async () => {
+    const fileId = "invalid-file-id";
+    const { status, body } = await userRequest(
+      "POST",
+      `http://target?id=${fileId}`
+    );
+
+    expect(status).toBe(404);
+    expect(body).toBe("The file with the given file ID could not be found.");
+  });
 });
