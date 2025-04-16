@@ -40,6 +40,11 @@ app.post("/", async (req, res) => {
   }
 
   const virtualFileUuid = req.query.id;
+  if (!virtualFileUuid) {
+    return res
+      .status(400)
+      .send("The request should contain a file ID as parameter.");
+  }
   const fileUriQuery = generateFileUriSelectQuery(virtualFileUuid);
   const fileUriResult = await query(fileUriQuery);
   const fileUriBindings = fileUriResult.results.bindings;
