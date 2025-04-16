@@ -8,7 +8,7 @@ import {
   runSudoQuery,
 } from "contract-tests";
 
-describe("bpmn elements extraction", () => {
+describe("bpmn elements extraction - unauthorized", () => {
   test("not authenticated", async () => {
     const { status, body } = await userRequest("POST", "http://target");
 
@@ -17,10 +17,10 @@ describe("bpmn elements extraction", () => {
   });
 
   test("no organization", async () => {
-    const groupUri = "http://data.lblod.info/id/bestuurseenheden/1";
+    const groupUri = "http://data.lblod.info/id/bestuurseenheden/2";
     await mockLogin(
       groupUri,
-      "http://data.lblod.info/id/accounts/1",
+      "http://data.lblod.info/id/accounts/2",
       "LoketLB-OpenProcesHuisGebruiker"
     );
     const sessionUri = await getSession();
@@ -34,7 +34,7 @@ describe("bpmn elements extraction", () => {
 
     const { status, body } = await userRequest("POST", "http://target");
 
-    expect(status).toBe(401);
+    expect(status).toBe(403);
     expect(body).toBe("User not affiliated with any organization.");
   });
 });

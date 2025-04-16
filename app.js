@@ -36,7 +36,7 @@ app.post("/", async (req, res) => {
   const groupUriResult = await querySudo(groupUriQuery);
   const groupUri = groupUriResult.results.bindings[0]?.groupUri?.value;
   if (!groupUri) {
-    return res.status(401).send("User not affiliated with any organization.");
+    return res.status(403).send("User not affiliated with any organization.");
   }
 
   const virtualFileUuid = req.query.id;
