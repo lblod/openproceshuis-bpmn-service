@@ -17,10 +17,11 @@ describe("bpmn elements extraction - unauthorized", () => {
   });
 
   test("no organization", async () => {
-    const groupUri = "http://data.lblod.info/id/bestuurseenheden/2";
+    const groupUri =
+      "http://data.lblod.info/id/bestuurseenheden/65be70ac-ca49-447b-b694-8c5315f4b974";
     await mockLogin(
       groupUri,
-      "http://data.lblod.info/id/accounts/2",
+      "http://data.lblod.info/id/accounts/b81e9d32-edbf-433d-9345-74257951e844",
       "LoketLB-OpenProcesHuisGebruiker"
     );
     const sessionUri = await getSession();
