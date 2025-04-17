@@ -61,6 +61,17 @@ describe("bpmn elements extraction - authorized", () => {
       "Could not find file in path. Check if the physical file is available on the server and if this service has the right mountpoint."
     );
   });
+
+  test("valid stored file", async () => {
+    const { status, body } = await userRequest(
+      "POST",
+      `http://target?id=${STORED_VIRTUAL_FILE_UUID}`
+    );
+    const message = JSON.parse(body).message;
+
+    expect(status).toBe(202);
+    expect(message).toBe("process steps extraction job running");
+  });
 });
 
 async function registerFile(uploadResourceUuid, fileResourceUuid) {
@@ -68,7 +79,7 @@ async function registerFile(uploadResourceUuid, fileResourceUuid) {
   const fileResourceName = `${fileResourceUuid}.bpmn`;
   const fileResourceUri = `share://${fileResourceName}`;
 
-  const insertFileQuery = `
+  await runSudoQuery(`
     PREFIX mu: <http://mu.semte.ch/vocabularies/core/>  
     PREFIX nfo: <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#>
     PREFIX nie: <http://www.semanticdesktop.org/ontologies/2007/01/19/nie#>
@@ -88,6 +99,5 @@ async function registerFile(uploadResourceUuid, fileResourceUuid) {
                              mu:uuid "${fileResourceUuid}" .
       }
     }
-  `;
-  await runSudoQuery(insertFileQuery);
+  `);
 }

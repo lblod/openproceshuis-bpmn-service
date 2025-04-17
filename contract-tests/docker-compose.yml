@@ -6,6 +6,9 @@ services:
       - 8777:80
     depends_on:
       - database
+    volumes:
+      - ./config/bpmn:/config
+      - ./mock-files:/share
   database:
     image: semtech/sparql-parser:0.0.14
     volumes:
@@ -16,6 +19,8 @@ services:
   virtuoso:
     image: redpencil/virtuoso:1.2.1
     attach: false
+    ports:
+      - "8890:8890"
     environment:
       SPARQL_UPDATE: "true"
       DEFAULT_GRAPH: "http://mu.semte.ch/application"
