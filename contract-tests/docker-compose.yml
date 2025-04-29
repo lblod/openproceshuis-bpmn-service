@@ -1,0 +1,49 @@
+services:
+  target:
+    build: ../
+    attach: false
+    ports:
+      - 8777:80
+    depends_on:
+      - database
+    volumes:
+      - ./config/bpmn:/config
+      - ./mock-files:/share
+  database:
+    image: semtech/sparql-parser:0.0.14
+    volumes:
+      - ./config/authorization:/config
+      - ./data/mu-auth:/data
+    depends_on:
+      - virtuoso
+  virtuoso:
+    image: redpencil/virtuoso:1.2.1
+    attach: false
+    ports:
+      - "8890:8890"
+    environment:
+      SPARQL_UPDATE: "true"
+      DEFAULT_GRAPH: "http://mu.semte.ch/application"
+    volumes:
+      - ./data/toLoad:/data/toLoad
+      - ./config/virtuoso/virtuoso.ini:/data/virtuoso.ini
+      - ./config/virtuoso/:/opt/virtuoso-scripts
+  deltanotifier:
+    image: semtech/mu-delta-notifier:0.4.0
+    attach: false
+    volumes:
+      - ./config/delta:/config
+  tests:
+    image: lblod/contract-testing
+    environment:
+      NODE_ENV: "development"
+      MU_SPARQL_ENDPOINT: "http://database:8890/sparql"
+      LOG_SPARQL_ALL: "true"
+    command: "test -- -u"
+    depends_on:
+      - target
+      - database
+      - virtuoso
+    volumes:
+      - ./tests/:/tests/tests
+      - ./node_modules/:/tests/node_modules

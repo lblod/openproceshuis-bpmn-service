@@ -36,15 +36,22 @@ app.post("/", async (req, res) => {
   const groupUriResult = await querySudo(groupUriQuery);
   const groupUri = groupUriResult.results.bindings[0]?.groupUri?.value;
   if (!groupUri) {
-    return res.status(401).send("User not affiliated with any organization.");
+    return res.status(403).send("User not affiliated with any organization.");
   }
 
   const virtualFileUuid = req.query.id;
+  if (!virtualFileUuid) {
+    return res
+      .status(400)
+      .send("The request should contain a file ID as parameter.");
+  }
   const fileUriQuery = generateFileUriSelectQuery(virtualFileUuid);
   const fileUriResult = await query(fileUriQuery);
   const fileUriBindings = fileUriResult.results.bindings;
   if (fileUriBindings.length === 0) {
-    return res.status(404).send("Not Found");
+    return res
+      .status(404)
+      .send("The file with the given file ID could not be found.");
   }
   const virtualFileUri = fileUriBindings[0].virtualFileUri.value;
   const physicalFileUri = fileUriBindings[0].physicalFileUri.value;
