@@ -18,7 +18,7 @@ const HEADER_MU_SESSION_ID = "mu-session-id";
 const JOB_GRAPH = "http://mu.semte.ch/graphs/bpmn-job";
 const JOB_OPERATION =
   "http://redpencil.data.gift/id/jobs/concept/JobOperation/BpmnToRdf";
-import { HttpError, UploadError } from "./utils/http-error.js";
+import { HttpError } from "./utils/http-error.js";
 
 app.use(
   bodyParser.json({
