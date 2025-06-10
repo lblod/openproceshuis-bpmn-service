@@ -32,7 +32,7 @@ app.post("/", async (req, res, next) => {
   try {
     const sessionUri = req.get(HEADER_MU_SESSION_ID);
     if (!sessionUri) {
-      throw new HttpError("Session ID header werd niet gevonden.", 401);
+      throw new HttpError("Session ID header werd niet gevonden.", 400);
     }
     const groupUriQuery = generateGroupUriSelectQuery(sessionUri);
     const groupUriResult = await querySudo(groupUriQuery);
