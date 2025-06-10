@@ -62,7 +62,7 @@ app.post("/", async (req, res, next) => {
     }
     const virtualFileUri = fileUriBindings[0].virtualFileUri.value;
     const physicalFileUri = fileUriBindings[0].physicalFileUri.value;
-
+    
     const fileGroupLinkInsertQuery = generateFileGroupLinkInsertQuery(
       virtualFileUri,
       groupUri

@@ -1,0 +1,1209 @@
+@prefix bbo: <https://www.irit.fr/recherches/MELODI/ontologies/BBO#>.
+@prefix bboExtension: <https://www.teamingai-project.eg/BBOExtension#>.
+@prefix ql: <http://semweb.mmlab.be/ns/ql#>.
+@prefix rami: <https://w3id.org/i40/rami#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rml: <http://semweb.mmlab.be/ns/rml#>.
+@prefix rr: <http://www.w3.org/ns/r2rml#>.
+@prefix teamingAI: <https://www.teamingai-project.eu/>.
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#>.
+@prefix fno: <https://w3id.org/function/ontology#>.
+@prefix idlab-fn: <http://example.com/idlab/function/>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+
+<#UuidFunctionMapping>
+    fnml:functionValue [
+        rr:subjectMap <#UuidFunctionMapping>;
+        rr:predicateObjectMap [
+            rr:predicate fno:executes ;
+            rr:objectMap [ rr:constant idlab-fn:random ]
+        ]
+    ].
+
+teamingAI:AssociationMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:association']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:Association ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:has_sourceRef;
+        rr:objectMap [ rr:template "{@sourceRef}" ]
+    ],
+    [
+        rr:predicate bbo:has_targetRef;
+        rr:objectMap [ rr:template "{@targetRef}" ]
+    ].
+
+teamingAI:BoundaryEventMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:boundaryEvent']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:BoundaryEvent ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:CatchEvent ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Event ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:attachedToRef;
+        rr:objectMap [ rr:template "{@attachedToRef}" ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate bbo:has_outgoing;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:outgoing']}" ]
+    ],
+    [
+        rr:predicate bbo:has_eventDefinition;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:messageEventDefinition']/@id}" ]
+    ],
+    [
+        rr:predicate bbo:has_eventDefinition;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:errorEventDefinition']/@id}" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:BusinessRuleTaskMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:businessRuleTask']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:BusinessRuleTask ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Task ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Activity ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:CollaborationMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']//*[name()='bpmn:collaboration']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:Collaboration ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:DataInputAssociationMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']//*[name()='bpmn:dataInputAssociation']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:DataInputAssociation ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:has_sourceRef;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:sourceRef']}" ]
+    ],
+    [
+        rr:predicate bbo:has_targetRef;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:targetRef']}" ]
+    ],
+    [
+        rr:predicate bboExtension:is_dataInputFor;
+        rr:objectMap [ rr:template "{../@id}" ]
+    ].
+
+teamingAI:DataObjectMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']//*[name()='bpmn:dataObject']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:DataObject ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:DataObjectReferenceMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']//*[name()='bpmn:dataObjectReference']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:DataObjectReference ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bboExtension:dataObjectRef;
+        rr:objectMap [ rr:template "{@dataObjectRef}" ]
+    ].
+
+teamingAI:DataOutputAssociationMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']//*[name()='bpmn:dataOutputAssociation']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:DataOutputAssociation ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:has_targetRef;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:targetRef']}" ]
+    ],
+    [
+        rr:predicate bboExtension:is_dataOutputFrom;
+        rr:objectMap [ rr:template "{../@id}" ]
+    ].
+
+teamingAI:DataStoreReferenceMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']//*[name()='bpmn:dataStoreReference']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:DataStoreReference ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ].
+
+teamingAI:EndEventMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:endEvent']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:EndEvent ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:ThrowEvent ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Event ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate bbo:has_incoming;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:incoming']}" ]
+    ].
+
+teamingAI:ErrorEventDefinitionMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "//*[name()='bpmn:errorEventDefinition']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:ErrorEventDefinition ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:EventDefinition ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:RootElement ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:ErrorMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:error']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Error ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:RootElement ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:ExclusiveGatewayMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']//*[name()='bpmn:exclusiveGateway']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:ExclusiveGateway ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Gateway ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:has_defaultElement;
+        rr:objectMap [ rr:template "{@default}" ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate bbo:has_outgoing;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:outgoing']}" ]
+    ],
+    [
+        rr:predicate bbo:has_incoming;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:incoming']}" ]
+    ].
+
+teamingAI:InclusiveGatewayMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']//*[name()='bpmn:inclusiveGateway']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:InclusiveGateway ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Gateway ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:has_defaultElement;
+        rr:objectMap [ rr:template "{@default}" ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate bbo:has_outgoing;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:outgoing']}" ]
+    ],
+    [
+        rr:predicate bbo:has_incoming;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:incoming']}" ]
+    ].
+
+teamingAI:IntermediateThrowEventMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']//*[name()='bpmn:intermediateThrowEvent']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:IntermediateThrowEvent ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:ThrowEvent ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Event ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate bbo:has_outgoing;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:outgoing']}" ]
+    ],
+    [
+        rr:predicate bbo:has_incoming;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:incoming']}" ]
+    ],
+    [
+        rr:predicate bbo:has_eventDefinition;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:messageEventDefinition']}" ]
+    ].
+
+teamingAI:LaneMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:laneSet']/*[name()='bpmn:lane']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:Lane ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:has_activity;
+        rr:objectMap [ rr:template "{*[text()]}" ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ].
+
+teamingAI:LaneSetMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:laneSet']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:LaneSet ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:ManualTaskMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:manualTask']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:ManualTask ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Task ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Activity ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:MessageEventDefinitionMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "//*[name()='bpmn:messageEventDefinition']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:MessageEventDefinition ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:EventDefinition ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:RootElement ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:MessageFlowMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:collaboration']/*[name()='bpmn:messageFlow']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:MessageFlow ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate bbo:has_sourceRef;
+        rr:objectMap [ rr:template "{@sourceRef}" ]
+    ],
+    [
+        rr:predicate bbo:has_targetRef;
+        rr:objectMap [ rr:template "{@targetRef}" ]
+    ].
+
+teamingAI:ParallelGatewayMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:parallelGateway']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:ParallelGateway ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Gateway ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:has_defaultElement;
+        rr:objectMap [ rr:template "{@default}" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate bbo:has_outgoing;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:outgoing']}" ]
+    ],
+    [
+        rr:predicate bbo:has_incoming;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:incoming']}" ]
+    ].
+
+teamingAI:ParticipantMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:collaboration']/*[name()='bpmn:participant']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:Participant ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate bboExtension:processRef;
+        rr:objectMap [ rr:template "{@processRef}" ]
+    ].
+
+teamingAI:ProcessMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Process ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElementsContainer ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:CallableElement ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:RootElement ]
+    ].
+
+teamingAI:PropertyMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']//*[name()='bpmn:property']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Property ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate bbo:has_property_element;
+        rr:objectMap [ rr:template "{../@id}" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:ReceiveTaskMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:receiveTask']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:ReceiveTask ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Task ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Activity ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:ScriptTaskMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:scriptTask']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:ScriptTask ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Task ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Activity ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:SendTaskMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:sendTask']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:SendTask ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Task ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Activity ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:SequenceFlowMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:sequenceFlow']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:SequenceFlow ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:has_sourceRef;
+        rr:objectMap [ rr:template "{@sourceRef}" ]
+    ],
+    [
+        rr:predicate bbo:has_targetRef;
+        rr:objectMap [ rr:template "{@targetRef}" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ].
+
+teamingAI:ServiceTaskMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:serviceTask']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:ServiceTask ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Task ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Activity ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:StartEventMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:startEvent']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:StartEvent ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:CatchEvent ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Event ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:has_outgoing;
+        rr:objectMap [ rr:template "{./*[name()='bpmn:outgoing']}" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ].
+
+teamingAI:SubProcessMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:subProcess']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:SubProcess ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Activity ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElementsContainer ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToRAMILayer;
+        rr:objectMap [ rr:constant rami:Business ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToView;
+        rr:objectMap [ rr:constant teamingAI:BusinessProcessManagementView ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:TaskMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:task']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Task ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Activity ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
+
+teamingAI:TextAnnotationMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:textAnnotation']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bboExtension:TextAnnotation ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ],
+    [
+        rr:predicate rdfs:comment;
+        rr:objectMap [ rr:template "{*[text()]}" ]
+    ].
+
+teamingAI:UserTaskMapping
+    a rr:TriplesMap;
+
+    rml:logicalSource [
+        rml:source "input.bpmn";
+        rml:referenceFormulation ql:XPath;
+        rml:iterator "/*[name()='bpmn:definitions']/*[name()='bpmn:process']/*[name()='bpmn:userTask']"
+    ];
+
+    rr:subjectMap <#UuidFunctionMapping>;
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:UserTask ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Task ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:Activity ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowNode ]
+    ],
+    [
+        rr:predicate rdf:type;
+        rr:objectMap [ rr:constant bbo:FlowElement ]
+    ],
+    [
+        rr:predicate bbo:name;
+        rr:objectMap [ rml:reference "@name" ]
+    ],
+    [
+        rr:predicate teamingAI:belongsToProcess;
+        rr:objectMap [ rr:parentTriplesMap teamingAI:ProcessMapping ]
+    ].
