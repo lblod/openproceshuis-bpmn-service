@@ -19,6 +19,7 @@ const JOB_GRAPH = "http://mu.semte.ch/graphs/bpmn-job";
 const JOB_OPERATION =
   "http://redpencil.data.gift/id/jobs/concept/JobOperation/BpmnToRdf";
 import { HttpError } from "./utils/http-error.js";
+import { STATUS_CODE } from "./utils/constants.js";
 
 app.use(
   bodyParser.json({
@@ -40,14 +41,14 @@ app.post("/", async (req, res, next) => {
     if (!groupUri) {
       throw new HttpError(
         "Gebruiker maakt geen deel uit van een organisatie.",
-        401
+        STATUS_CODE.UNAUTHORIZED
       );
     }
     const virtualFileUuid = req.query.id;
     if (!virtualFileUuid) {
       throw new HttpError(
         "Bestand id ontbrak tijdens het uploaden van het bpmn bestand.",
-        400
+        STATUS_CODE.BAD_REQUEST
       );
     }
     const fileUriQuery = generateFileUriSelectQuery(virtualFileUuid);
@@ -56,7 +57,7 @@ app.post("/", async (req, res, next) => {
     if (fileUriBindings.length === 0) {
       throw new HttpError(
         `Bestand id ${virtualFileUuid} werd niet gevonden in onze server.`,
-        404
+        STATUS_CODE.NOT_FOUND
       );
     }
     const virtualFileUri = fileUriBindings[0].virtualFileUri.value;
@@ -70,7 +71,10 @@ app.post("/", async (req, res, next) => {
 
     const filePath = physicalFileUri.replace("share://", STORAGE_FOLDER_PATH);
     if (!existsSync(filePath)) {
-      throw new HttpError("Kan bestand in pad niet vinden.", 500);
+      throw new HttpError(
+        "Kan bestand in pad niet vinden.",
+        STATUS_CODE.INTERNAL_SERVER_ERROR
+      );
     }
 
     runAsyncJob(JOB_GRAPH, JOB_OPERATION, groupUri, virtualFileUri, () =>
@@ -78,11 +82,10 @@ app.post("/", async (req, res, next) => {
     );
 
     return res
-      .status(202)
+      .status(STATUS_CODE.ACCEPTED)
       .send({ message: "process steps extraction job running" });
   } catch (err) {
     console.error("Error in POST /:", err);
-    // Forward error to error middleware
     next(err);
   }
 });
@@ -99,7 +102,7 @@ async function translateToRdf(bpmn, virtualFileUri) {
   if (!bpmn || bpmn.trim().length === 0) {
     throw new HttpError(
       "Ongeldige inhoud: Het meegeleverde bestand bevat geen inhoud.",
-      400
+      STATUS_CODE.BAD_REQUEST
     );
   }
 
@@ -122,7 +125,7 @@ async function translateToRdf(bpmn, virtualFileUri) {
   if (!triples || triples.trim().length === 0) {
     throw new HttpError(
       "Ongeldige inhoud: Het meegeleverde bestand heeft geen geldige inhoud.",
-      400
+      STATUS_CODE.BAD_REQUEST
     );
   }
 
@@ -168,7 +171,7 @@ async function insertTripleChunks(tripleChunks, maxTriplesPerInsert = 100) {
 }
 
 const errorHandler = function (err, _req, res, _next) {
-  res.status(err.status || 500);
+  res.status(err.status || STATUS_CODE.INTERNAL_SERVER_ERROR);
   res.json({
     errors: [
       {

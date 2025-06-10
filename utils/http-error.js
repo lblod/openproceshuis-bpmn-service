@@ -7,6 +7,6 @@ export class HttpError extends Error {
     this.status = status || STATUS_CODE.INTERNAL_SERVER_ERROR;
     this.description = description || null;
 
-    console.log("\n Http error: ", this.message);
+    console.error("\n Http error: ", this.message);
   }
 }

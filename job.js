@@ -5,6 +5,8 @@ import {
   sparqlEscapeDateTime,
 } from "mu";
 import { querySudo as query, updateSudo as update } from "@lblod/mu-auth-sudo";
+import { HttpError } from "./utils/http-error";
+import { STATUS_CODE } from "./utils/constants";
 
 const PREFIXES = `
   PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
@@ -161,11 +163,12 @@ export async function runAsyncJob(
     await asyncFunc();
     await updateStatusJob(jobsGraph, jobUri, STATUS_SUCCESS);
   } catch (error) {
-    console.error(
-      `Error while scheduling job ${jobOperation}: ${error.message}`
-    );
-    console.error(error);
     await storeError(jobsGraph, creatorUri, error.message);
     await updateStatusJob(jobsGraph, jobUri, STATUS_FAILED);
+
+    throw new HttpError(
+      `Error tijdens het uitvoeren van job ${jobOperation}: ${error.message}`,
+      STATUS_CODE.INTERNAL_SERVER_ERROR
+    );
   }
 }
