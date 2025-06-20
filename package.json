@@ -1,6 +1,6 @@
 {
   "name": "bpmn-service",
-  "version": "2.1.0-0",
+  "version": "2.1.0",
   "description": "OpenProcessHuis Bpmn Service",
   "main": "index.js",
   "scripts": {
