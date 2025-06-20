@@ -18,8 +18,8 @@ const HEADER_MU_SESSION_ID = "mu-session-id";
 const JOB_GRAPH = "http://mu.semte.ch/graphs/bpmn-job";
 const JOB_OPERATION =
   "http://redpencil.data.gift/id/jobs/concept/JobOperation/BpmnToRdf";
-import { HttpError } from "./utils/http-error.js";
-import { STATUS_CODE } from "./utils/constants.js";
+import { BpmnError } from "./utils/bpmn-error.js";
+import { BPMN_CODE, HTTP_CODE } from "./utils/constants.js";
 
 app.use(
   bodyParser.json({
@@ -33,31 +33,38 @@ app.post("/", async (req, res, next) => {
   try {
     const sessionUri = req.get(HEADER_MU_SESSION_ID);
     if (!sessionUri) {
-      throw new HttpError("Session ID header werd niet gevonden.", 400);
+      throw new BpmnError(
+        "Session ID header werd niet gevonden.",
+        BPMN_CODE.SESSION_ID_NOT_FOUND,
+        HTTP_CODE.UNAUTHORIZED
+      );
     }
     const groupUriQuery = generateGroupUriSelectQuery(sessionUri);
     const groupUriResult = await querySudo(groupUriQuery);
     const groupUri = groupUriResult.results.bindings[0]?.groupUri?.value;
     if (!groupUri) {
-      throw new HttpError(
+      throw new BpmnError(
         "Gebruiker maakt geen deel uit van een organisatie.",
-        STATUS_CODE.UNAUTHORIZED
+        BPMN_CODE.GROUP_URI_NOT_FOUND,
+        HTTP_CODE.FORBIDDEN
       );
     }
     const virtualFileUuid = req.query.id;
     if (!virtualFileUuid) {
-      throw new HttpError(
+      throw new BpmnError(
         "Bestand id ontbrak tijdens het uploaden van het bpmn bestand.",
-        STATUS_CODE.BAD_REQUEST
+        BPMN_CODE.EMPTY_VIRTUAL_FILE_ID,
+        HTTP_CODE.BAD_REQUEST
       );
     }
     const fileUriQuery = generateFileUriSelectQuery(virtualFileUuid);
     const fileUriResult = await query(fileUriQuery);
     const fileUriBindings = fileUriResult.results.bindings;
     if (fileUriBindings.length === 0) {
-      throw new HttpError(
+      throw new BpmnError(
         `Bestand id ${virtualFileUuid} werd niet gevonden in onze server.`,
-        STATUS_CODE.NOT_FOUND
+        BPMN_CODE.VIRTUAL_FILE_ID_NOT_FOUND,
+        HTTP_CODE.NOT_FOUND
       );
     }
     const virtualFileUri = fileUriBindings[0].virtualFileUri.value;
@@ -71,9 +78,10 @@ app.post("/", async (req, res, next) => {
 
     const filePath = physicalFileUri.replace("share://", STORAGE_FOLDER_PATH);
     if (!existsSync(filePath)) {
-      throw new HttpError(
+      throw new BpmnError(
         "Kan bestand in pad niet vinden.",
-        STATUS_CODE.INTERNAL_SERVER_ERROR
+        BPMN_CODE.PHYSICAL_FILE_ID_NOT_FOUND,
+        HTTP_CODE.INTERNAL_SERVER_ERROR
       );
     }
 
@@ -82,7 +90,7 @@ app.post("/", async (req, res, next) => {
     );
 
     return res
-      .status(STATUS_CODE.ACCEPTED)
+      .status(HTTP_CODE.ACCEPTED)
       .send({ message: "process steps extraction job running" });
   } catch (err) {
     console.error("Error in POST /:", err);
@@ -100,9 +108,10 @@ async function extractAndInsertProcessSteps(bpmnFilePath, virtualFileUri) {
 
 async function translateToRdf(bpmn, virtualFileUri) {
   if (!bpmn || bpmn.trim().length === 0) {
-    throw new HttpError(
+    throw new BpmnError(
       "Ongeldige inhoud: Het meegeleverde bestand bevat geen inhoud.",
-      STATUS_CODE.BAD_REQUEST
+      BPMN_CODE.EMPTY_CONTENT,
+      HTTP_CODE.UNPROCESSABLE_ENTITY
     );
   }
 
@@ -123,9 +132,10 @@ async function translateToRdf(bpmn, virtualFileUri) {
     options
   );
   if (!triples || triples.trim().length === 0) {
-    throw new HttpError(
+    throw new BpmnError(
       "Ongeldige inhoud: Het meegeleverde bestand heeft geen geldige inhoud.",
-      STATUS_CODE.BAD_REQUEST
+      BPMN_CODE.INVALID_CONTENT,
+      HTTP_CODE.UNPROCESSABLE_ENTITY
     );
   }
 
@@ -176,7 +186,7 @@ const errorHandler = function (err, _req, res, _next) {
     errors: [
       {
         message: err.message,
-        description: err.description,
+        code: err.code,
         status: err.status,
       },
     ],
