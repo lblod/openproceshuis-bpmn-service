@@ -45,8 +45,7 @@ app.post("/", async (req, res, next) => {
     if (!groupUri) {
       throw new BpmnError(
         "Gebruiker maakt geen deel uit van een organisatie.",
-        BPMN_CODE.GROUP_URI_NOT_FOUND,
-        HTTP_CODE.FORBIDDEN
+        BPMN_CODE.GROUP_URI_NOT_FOUND
       );
     }
     const virtualFileUuid = req.query.id;
@@ -63,13 +62,12 @@ app.post("/", async (req, res, next) => {
     if (fileUriBindings.length === 0) {
       throw new BpmnError(
         `Bestand id ${virtualFileUuid} werd niet gevonden in onze server.`,
-        BPMN_CODE.VIRTUAL_FILE_ID_NOT_FOUND,
-        HTTP_CODE.NOT_FOUND
+        BPMN_CODE.VIRTUAL_FILE_ID_NOT_FOUND
       );
     }
     const virtualFileUri = fileUriBindings[0].virtualFileUri.value;
     const physicalFileUri = fileUriBindings[0].physicalFileUri.value;
-    
+
     const fileGroupLinkInsertQuery = generateFileGroupLinkInsertQuery(
       virtualFileUri,
       groupUri
@@ -80,8 +78,7 @@ app.post("/", async (req, res, next) => {
     if (!existsSync(filePath)) {
       throw new BpmnError(
         "Kan bestand in pad niet vinden.",
-        BPMN_CODE.PHYSICAL_FILE_ID_NOT_FOUND,
-        HTTP_CODE.INTERNAL_SERVER_ERROR
+        BPMN_CODE.PHYSICAL_FILE_ID_NOT_FOUND
       );
     }
 
@@ -110,8 +107,7 @@ async function translateToRdf(bpmn, virtualFileUri) {
   if (!bpmn || bpmn.trim().length === 0) {
     throw new BpmnError(
       "Ongeldige inhoud: Het meegeleverde bestand bevat geen inhoud.",
-      BPMN_CODE.EMPTY_CONTENT,
-      HTTP_CODE.UNPROCESSABLE_ENTITY
+      BPMN_CODE.EMPTY_CONTENT
     );
   }
 
@@ -134,8 +130,7 @@ async function translateToRdf(bpmn, virtualFileUri) {
   if (!triples || triples.trim().length === 0) {
     throw new BpmnError(
       "Ongeldige inhoud: Het meegeleverde bestand heeft geen geldige inhoud.",
-      BPMN_CODE.INVALID_CONTENT,
-      HTTP_CODE.UNPROCESSABLE_ENTITY
+      BPMN_CODE.INVALID_CONTENT
     );
   }
 
@@ -181,13 +176,12 @@ async function insertTripleChunks(tripleChunks, maxTriplesPerInsert = 100) {
 }
 
 const errorHandler = function (err, _req, res, _next) {
-  res.status(err.status || STATUS_CODE.INTERNAL_SERVER_ERROR);
+  res.status(err.status || HTTP_CODE.INTERNAL_SERVER_ERROR);
   res.json({
     errors: [
       {
         message: err.message,
         code: err.code,
-        status: err.status,
       },
     ],
   });
