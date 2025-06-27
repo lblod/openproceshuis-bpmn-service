@@ -34,7 +34,7 @@ app.post("/", async (req, res, next) => {
     const sessionUri = req.get(HEADER_MU_SESSION_ID);
     if (!sessionUri) {
       throw new BpmnError(
-        "Session ID header werd niet gevonden.",
+        "Session ID was not found.",
         BPMN_CODE.SESSION_ID_NOT_FOUND
       );
     }
@@ -43,14 +43,14 @@ app.post("/", async (req, res, next) => {
     const groupUri = groupUriResult.results.bindings[0]?.groupUri?.value;
     if (!groupUri) {
       throw new BpmnError(
-        "Gebruiker maakt geen deel uit van een organisatie.",
+        "Group URI was not found.",
         BPMN_CODE.GROUP_URI_NOT_FOUND
       );
     }
     const virtualFileUuid = req.query.id;
     if (!virtualFileUuid) {
       throw new BpmnError(
-        "Bestand id ontbrak tijdens het uploaden van het bpmn bestand.",
+        "Virtual file ID was missing.",
         BPMN_CODE.EMPTY_VIRTUAL_FILE_ID
       );
     }
@@ -59,7 +59,7 @@ app.post("/", async (req, res, next) => {
     const fileUriBindings = fileUriResult.results.bindings;
     if (fileUriBindings.length === 0) {
       throw new BpmnError(
-        `Bestand id ${virtualFileUuid} werd niet gevonden in onze server.`,
+        `Virtual file ID ${virtualFileUuid} was not found on our server.`,
         BPMN_CODE.VIRTUAL_FILE_ID_NOT_FOUND
       );
     }
@@ -75,7 +75,7 @@ app.post("/", async (req, res, next) => {
     const filePath = physicalFileUri.replace("share://", STORAGE_FOLDER_PATH);
     if (!existsSync(filePath)) {
       throw new BpmnError(
-        "Kan bestand in pad niet vinden.",
+        "Could not find path of physical file.",
         BPMN_CODE.PHYSICAL_FILE_ID_NOT_FOUND
       );
     }
@@ -104,7 +104,7 @@ async function extractAndInsertProcessSteps(bpmnFilePath, virtualFileUri) {
 async function translateToRdf(bpmn, virtualFileUri) {
   if (!bpmn || bpmn.trim().length === 0) {
     throw new BpmnError(
-      "Ongeldige inhoud: Het meegeleverde bestand bevat geen inhoud.",
+      "Invalid content: Provided file does not contain any content.",
       BPMN_CODE.EMPTY_CONTENT
     );
   }
@@ -127,7 +127,7 @@ async function translateToRdf(bpmn, virtualFileUri) {
   );
   if (!triples || triples.trim().length === 0) {
     throw new BpmnError(
-      "Ongeldige inhoud: Het meegeleverde bestand heeft geen geldige inhoud.",
+      "Invalid content: Provided file does not contain valid content.",
       BPMN_CODE.INVALID_CONTENT
     );
   }

@@ -167,7 +167,7 @@ export async function runAsyncJob(
     await updateStatusJob(jobsGraph, jobUri, STATUS_FAILED);
 
     throw new BpmnError(
-      `Error tijdens het uitvoeren van job ${jobOperation}: ${error.message}`,
+      `Error during executing job ${jobOperation}: ${error.message}.`,
       BPMN_CODE.ERROR_DURING_JOB_EXECUTION
     );
   }
