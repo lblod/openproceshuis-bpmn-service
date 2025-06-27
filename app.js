@@ -35,8 +35,7 @@ app.post("/", async (req, res, next) => {
     if (!sessionUri) {
       throw new BpmnError(
         "Session ID header werd niet gevonden.",
-        BPMN_CODE.SESSION_ID_NOT_FOUND,
-        HTTP_CODE.UNAUTHORIZED
+        BPMN_CODE.SESSION_ID_NOT_FOUND
       );
     }
     const groupUriQuery = generateGroupUriSelectQuery(sessionUri);
@@ -52,8 +51,7 @@ app.post("/", async (req, res, next) => {
     if (!virtualFileUuid) {
       throw new BpmnError(
         "Bestand id ontbrak tijdens het uploaden van het bpmn bestand.",
-        BPMN_CODE.EMPTY_VIRTUAL_FILE_ID,
-        HTTP_CODE.BAD_REQUEST
+        BPMN_CODE.EMPTY_VIRTUAL_FILE_ID
       );
     }
     const fileUriQuery = generateFileUriSelectQuery(virtualFileUuid);

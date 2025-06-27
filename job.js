@@ -6,7 +6,7 @@ import {
 } from "mu";
 import { querySudo as query, updateSudo as update } from "@lblod/mu-auth-sudo";
 import { BpmnError } from "./utils/bpmn-error";
-import { BPMN_CODE, HTTP_CODE, STATUS_CODE } from "./utils/constants";
+import { BPMN_CODE } from "./utils/constants";
 
 const PREFIXES = `
   PREFIX mu: <http://mu.semte.ch/vocabularies/core/>
@@ -168,8 +168,7 @@ export async function runAsyncJob(
 
     throw new BpmnError(
       `Error tijdens het uitvoeren van job ${jobOperation}: ${error.message}`,
-      BPMN_CODE.ERROR_DURING_JOB_EXECUTION,
-      HTTP_CODE.INTERNAL_SERVER_ERROR
+      BPMN_CODE.ERROR_DURING_JOB_EXECUTION
     );
   }
 }
