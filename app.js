@@ -1,4 +1,4 @@
-import { app, update, query, errorHandler, uuid } from "mu";
+import { app, update, query, uuid } from "mu";
 import { querySudo } from "@lblod/mu-auth-sudo";
 import bodyParser from "body-parser";
 import { readFile } from "fs/promises";
@@ -18,6 +18,8 @@ const HEADER_MU_SESSION_ID = "mu-session-id";
 const JOB_GRAPH = "http://mu.semte.ch/graphs/bpmn-job";
 const JOB_OPERATION =
   "http://redpencil.data.gift/id/jobs/concept/JobOperation/BpmnToRdf";
+import { BpmnError } from "./utils/bpmn-error.js";
+import { BPMN_CODE, HTTP_CODE } from "./utils/constants.js";
 
 app.use(
   bodyParser.json({
@@ -27,60 +29,69 @@ app.use(
   })
 );
 
-app.post("/", async (req, res) => {
-  const sessionUri = req.get(HEADER_MU_SESSION_ID);
-  if (!sessionUri) {
-    return res.status(401).send("Session ID header not found.");
-  }
-  const groupUriQuery = generateGroupUriSelectQuery(sessionUri);
-  const groupUriResult = await querySudo(groupUriQuery);
-  const groupUri = groupUriResult.results.bindings[0]?.groupUri?.value;
-  if (!groupUri) {
-    return res.status(403).send("User not affiliated with any organization.");
-  }
-
-  const virtualFileUuid = req.query.id;
-  if (!virtualFileUuid) {
-    return res
-      .status(400)
-      .send("The request should contain a file ID as parameter.");
-  }
-  const fileUriQuery = generateFileUriSelectQuery(virtualFileUuid);
-  const fileUriResult = await query(fileUriQuery);
-  const fileUriBindings = fileUriResult.results.bindings;
-  if (fileUriBindings.length === 0) {
-    return res
-      .status(404)
-      .send("The file with the given file ID could not be found.");
-  }
-  const virtualFileUri = fileUriBindings[0].virtualFileUri.value;
-  const physicalFileUri = fileUriBindings[0].physicalFileUri.value;
-
-  const fileGroupLinkInsertQuery = generateFileGroupLinkInsertQuery(
-    virtualFileUri,
-    groupUri
-  );
-  await update(fileGroupLinkInsertQuery);
-
-  const filePath = physicalFileUri.replace("share://", STORAGE_FOLDER_PATH);
-  if (!existsSync(filePath)) {
-    return res
-      .status(500)
-      .send(
-        "Could not find file in path. Check if the physical file is available on the server and if this service has the right mountpoint."
+app.post("/", async (req, res, next) => {
+  try {
+    const sessionUri = req.get(HEADER_MU_SESSION_ID);
+    if (!sessionUri) {
+      throw new BpmnError(
+        "Session ID was not found.",
+        BPMN_CODE.SESSION_ID_NOT_FOUND
       );
+    }
+    const groupUriQuery = generateGroupUriSelectQuery(sessionUri);
+    const groupUriResult = await querySudo(groupUriQuery);
+    const groupUri = groupUriResult.results.bindings[0]?.groupUri?.value;
+    if (!groupUri) {
+      throw new BpmnError(
+        "Group URI was not found.",
+        BPMN_CODE.GROUP_URI_NOT_FOUND
+      );
+    }
+    const virtualFileUuid = req.query.id;
+    if (!virtualFileUuid) {
+      throw new BpmnError(
+        "Virtual file ID was missing.",
+        BPMN_CODE.EMPTY_VIRTUAL_FILE_ID
+      );
+    }
+    const fileUriQuery = generateFileUriSelectQuery(virtualFileUuid);
+    const fileUriResult = await query(fileUriQuery);
+    const fileUriBindings = fileUriResult.results.bindings;
+    if (fileUriBindings.length === 0) {
+      throw new BpmnError(
+        `Virtual file ID ${virtualFileUuid} was not found on our server.`,
+        BPMN_CODE.VIRTUAL_FILE_ID_NOT_FOUND
+      );
+    }
+    const virtualFileUri = fileUriBindings[0].virtualFileUri.value;
+    const physicalFileUri = fileUriBindings[0].physicalFileUri.value;
+
+    const fileGroupLinkInsertQuery = generateFileGroupLinkInsertQuery(
+      virtualFileUri,
+      groupUri
+    );
+    await update(fileGroupLinkInsertQuery);
+
+    const filePath = physicalFileUri.replace("share://", STORAGE_FOLDER_PATH);
+    if (!existsSync(filePath)) {
+      throw new BpmnError(
+        "Could not find path of physical file.",
+        BPMN_CODE.PHYSICAL_FILE_ID_NOT_FOUND
+      );
+    }
+
+    runAsyncJob(JOB_GRAPH, JOB_OPERATION, groupUri, virtualFileUri, () =>
+      extractAndInsertProcessSteps(filePath, virtualFileUri)
+    );
+
+    return res
+      .status(HTTP_CODE.ACCEPTED)
+      .send({ message: "process steps extraction job running" });
+  } catch (err) {
+    console.error("Error in POST /:", err);
+    next(err);
   }
-
-  runAsyncJob(JOB_GRAPH, JOB_OPERATION, groupUri, virtualFileUri, () =>
-    extractAndInsertProcessSteps(filePath, virtualFileUri)
-  );
-
-  return res
-    .status(202)
-    .send({ message: "process steps extraction job running" });
 });
-
-app.use(errorHandler);
 
 async function extractAndInsertProcessSteps(bpmnFilePath, virtualFileUri) {
   const bpmnFile = await readFile(bpmnFilePath, "utf-8");
@@ -92,11 +103,10 @@ async function extractAndInsertProcessSteps(bpmnFilePath, virtualFileUri) {
 
 async function translateToRdf(bpmn, virtualFileUri) {
   if (!bpmn || bpmn.trim().length === 0) {
-    const error = new Error(
-      "Invalid content: The provided file does not contain any content."
+    throw new BpmnError(
+      "Invalid content: Provided file does not contain any content.",
+      BPMN_CODE.EMPTY_CONTENT
     );
-    error.statusCode = 400;
-    throw error;
   }
 
   const inputFiles = {
@@ -116,11 +126,10 @@ async function translateToRdf(bpmn, virtualFileUri) {
     options
   );
   if (!triples || triples.trim().length === 0) {
-    const error = new Error(
-      "Invalid content: The provided file does not contain valid content."
+    throw new BpmnError(
+      "Invalid content: Provided file does not contain valid content.",
+      BPMN_CODE.INVALID_CONTENT
     );
-    error.statusCode = 400;
-    throw error;
   }
 
   return triples.split("\n");
@@ -163,3 +172,17 @@ async function insertTripleChunks(tripleChunks, maxTriplesPerInsert = 100) {
     }
   }
 }
+
+const errorHandler = function (err, _req, res, _next) {
+  res.status(err.status || HTTP_CODE.INTERNAL_SERVER_ERROR);
+  res.json({
+    errors: [
+      {
+        message: err.message,
+        code: err.code,
+      },
+    ],
+  });
+};
+
+app.use(errorHandler);
