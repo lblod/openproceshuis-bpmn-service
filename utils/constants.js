@@ -1,5 +1,6 @@
 export const HTTP_CODE = {
   OK: 200,
+  ACCEPTED: 202,
   INTERNAL_SERVER_ERROR: 500,
 };
 
