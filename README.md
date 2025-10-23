@@ -29,3 +29,23 @@ The endpoint does not wait for the process steps' extraction and insertion into 
 #### Headers
 
 - `mu-session-id`: each authenticated user has its own session. Based on the user's session ID, the endpoint will find the group (_Bestuur_) and link it to the BPMN file as follows: `<file uri> schema:publisher <group uri>`. Make sure the stack containing the OPH BPMN service also contains the [mu-identifier](https://github.com/mu-semtech/mu-identifier) service, as it will automatically add this header to each authenticated request.
+
+## Contract tests
+
+The service contains some contract tests, evaluating the output and database state after running the endpoint(s) for given input(s). The tests are executed using the [lblod/contract-testing](https://github.com/lblod/contract-testing) image.
+
+### How to run
+
+1. Move to the `contract-tests` folder:
+
+```bash
+cd contract-tests
+```
+
+2. Start the necessary containers and run the tests:
+
+```bash
+docker compose up -V  --abort-on-container-exit
+```
+
+> The `tests` container will log the test results.
