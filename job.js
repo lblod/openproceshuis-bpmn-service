@@ -122,25 +122,25 @@ async function updateStatusJob(jobsGraph, jobUri, status) {
     ${PREFIXES}
     DELETE {
       GRAPH ?g {
-        ?job adms:status ?status ;
-          dct:modified ?modified .
+        ?job adms:status ?status .
+        ?job dct:modified ?modified .
+      }
+    }
+    INSERT {
+      GRAPH ${sparqlEscapeUri(jobsGraph)} {
+        ?job adms:status ${sparqlEscapeUri(status)} .
+        ?job dct:modified ${sparqlEscapeDateTime(modified)} .
       }
     }
     WHERE {
       GRAPH ?g {
+        ?job a ${sparqlEscapeUri(JOB_TYPE)} .
+        ?job adms:status ?status .
+        ?job dct:modified ?modified .
         BIND(${sparqlEscapeUri(jobUri)} AS ?job)
-        ?job a ${sparqlEscapeUri(JOB_TYPE)} ;
-          adms:status ?status ;
-          dct:modified ?modified .
       }
     }
-    ;
-    INSERT DATA {
-      GRAPH ${sparqlEscapeUri(jobsGraph)} {
-        ${sparqlEscapeUri(jobUri)} adms:status ${sparqlEscapeUri(status)} ;
-          dct:modified ${sparqlEscapeDateTime(modified)} .
-      }
-    }`;
+  `;
 
   await update(updateStatusJobQuery);
 }
@@ -165,10 +165,5 @@ export async function runAsyncJob(
   } catch (error) {
     await storeError(jobsGraph, creatorUri, error.message);
     await updateStatusJob(jobsGraph, jobUri, STATUS_FAILED);
-
-    throw new BpmnError(
-      `Error during executing job ${jobOperation}: ${error.message}.`,
-      BPMN_CODE.ERROR_DURING_JOB_EXECUTION
-    );
   }
 }
